@@ -5,16 +5,11 @@ from common.log_wrappers import Logging
 from common import utils
 logger=Logging(__name__).get_logger()
 
-def main():
+def get_input_param():
     parser = argparse.ArgumentParser(
         description="Edit videos based on transcribed subtitles",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-
-    # logging.basicConfig(
-    #     format="[autocut:%(filename)s:L%(lineno)d] %(levelname)-6s %(message)s"
-    # )
-    # logging.getLogger().setLevel(logging.INFO)
 
     parser.add_argument("inputs", type=str, default="./data/test_001.mp4",nargs="+", help="Inputs filenames/folders")
     parser.add_argument(
@@ -91,6 +86,11 @@ def main():
     )
 
     args = parser.parse_args()
+    return args
+
+def main():
+    
+    args = get_input_param()
 
     if args.transcribe:
         from cores.transcribe import Transcribe
@@ -109,9 +109,7 @@ def main():
             trans_srt_to_md(args.encoding, args.force, args.inputs[0])
         else:
             logger.warn("Wrong number of files, please pass in a .srt file or an additional video file")
-            # logging.warn(
-            #     "Wrong number of files, please pass in a .srt file or an additional video file"
-            # )
+
     elif args.cut:
         from cores.cut import Cutter
 
@@ -124,7 +122,6 @@ def main():
         utils.compact_rst(args.inputs[0], args.encoding)
     else:
         logger.warn("No action, use -c, -t or -d")
-        # logging.warn("No action, use -c, -t or -d")
 
 
 if __name__ == "__main__":
