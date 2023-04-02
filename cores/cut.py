@@ -71,8 +71,11 @@ class Merger:
         logger.info(f"Saved merged video to {fn}")
 
 
-# Cut media
+
 class Cutter:
+    """_summary_
+        Cut media
+    """
     def __init__(self, args):
         self.args = args
 
@@ -166,3 +169,4 @@ class Cutter:
 
         media.close()
         logger.info(f"Saved media to {output_fn}")
+        return 0
