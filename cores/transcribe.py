@@ -1,16 +1,18 @@
 import datetime
-import logging
 import os
 import time
 
 import opencc
 import srt
 import torch
-import whisper
+# import whisper
 
+from cores import whisper
 from tqdm import tqdm
 
 from common import utils
+from common.log_wrappers import Logging
+logger = Logging(__name__).get_logger()
 
 
 def process(whisper_model, audio, seg, lang, prompt):
@@ -34,7 +36,7 @@ class Transcribe:
 
     def run(self):
         for input in self.args.inputs:
-            logging.info(f"Transcribing {input}")
+            logger.info(f"Transcribing {input}")
             name, _ = os.path.splitext(input)
             if utils.check_exists(name + ".md", self.args.force):
                 continue
@@ -52,9 +54,9 @@ class Transcribe:
 
             output = name + ".srt"
             self._save_srt(output, transcribe_results)
-            logging.info(f"Transcribed {input} to {output}")
+            logger.info(f"Transcribed {input} to {output}")
             self._save_md(name + ".md", output, input)
-            logging.info(f'Saved texts to {name + ".md"} to mark sentences')
+            logger.info(f'Saved texts to {name + ".md"} to mark sentences')
 
     def _detect_voice_activity(self, audio):
         """Detect segments that have voice activities"""
@@ -83,7 +85,7 @@ class Transcribe:
         # Merge very closed segments
         speeches = utils.merge_adjacent_segments(speeches, 0.5 * self.sampling_rate)
 
-        logging.info(f"Done voice activity detection in {time.time() - tic:.1f} sec")
+        logger.info(f"Done voice activity detection in {time.time() - tic:.1f} sec")
         return speeches if len(speeches) > 1 else [{"start": 0, "end": len(audio)}]
 
     def _transcribe(self, audio, speech_timestamps):
@@ -118,7 +120,7 @@ class Transcribe:
             pool.close()
             pool.join()
             pbar.close()
-            logging.info(f"Done transcription in {time.time() - tic:.1f} sec")
+            logger.info(f"Done transcription in {time.time() - tic:.1f} sec")
             return [i.get() for i in res]
         else:
             for seg in (
@@ -135,7 +137,7 @@ class Transcribe:
                 )
                 r["origin_timestamp"] = seg
                 res.append(r)
-            logging.info(f"Done transcription in {time.time() - tic:.1f} sec")
+            logger.info(f"Done transcription in {time.time() - tic:.1f} sec")
             return res
 
     def _save_srt(self, output, transcribe_results):

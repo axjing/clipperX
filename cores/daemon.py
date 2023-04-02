@@ -1,10 +1,12 @@
 import copy
 import glob
-import logging
 import os
 import time
 
 from . import cut, transcribe, utils
+from common.log_wrappers import Logging
+
+logger = Logging(__name__).get_logger()
 
 
 class Daemon:
@@ -35,7 +37,7 @@ class Daemon:
                     self.sleep = 1
                     break
                 except RuntimeError as e:
-                    logging.warn(
+                    logger.warn(
                         "Failed, may be due to the video is still on recording"
                     )
                     pass

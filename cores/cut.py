@@ -1,4 +1,3 @@
-import logging
 import os
 import re
 
@@ -6,6 +5,8 @@ import srt
 from moviepy import editor
 
 from . import utils
+from common.log_wrappers import Logging
+logger = Logging(__name__).get_logger()
 
 
 # Merge videos
@@ -56,18 +57,18 @@ class Merger:
             if not m:
                 continue
             fn = os.path.join(os.path.dirname(md_fn), m[0])
-            logging.info(f"Loading {fn}")
+            logger.info(f"Loading {fn}")
             videos.append(editor.VideoFileClip(fn))
 
         dur = sum([v.duration for v in videos])
-        logging.info(f"Merging into a video with {dur / 60:.1f} min length")
+        logger.info(f"Merging into a video with {dur / 60:.1f} min length")
 
         merged = editor.concatenate_videoclips(videos)
         fn = os.path.splitext(md_fn)[0] + "_merged.mp4"
         merged.write_videofile(
             fn, audio_codec="aac", bitrate=self.args.bitrate
         )  # logger=None,
-        logging.info(f"Saved merged video to {fn}")
+        logger.info(f"Saved merged video to {fn}")
 
 
 # Cut media
@@ -105,9 +106,9 @@ class Cutter:
                 if m:
                     index.append(int(m.groups()[0]))
             subs = [s for s in subs if s.index in index]
-            logging.info(f'Cut {fns["media"]} based on {fns["srt"]} and {fns["md"]}')
+            logger.info(f'Cut {fns["media"]} based on {fns["srt"]} and {fns["md"]}')
         else:
-            logging.info(f'Cut {fns["media"]} based on {fns["srt"]}')
+            logger.info(f'Cut {fns["media"]} based on {fns["srt"]}')
 
         segments = []
         # Avoid disordered subtitles
@@ -140,7 +141,7 @@ class Cutter:
         clips = [media.subclip(s["start"], s["end"]) for s in segments]
         if is_video_file:
             final_clip: editor.VideoClip = editor.concatenate_videoclips(clips)
-            logging.info(
+            logger.info(
                 f"Reduced duration from {media.duration:.1f} to {final_clip.duration:.1f}"
             )
 
@@ -154,7 +155,7 @@ class Cutter:
             )
         else:
             final_clip: editor.AudioClip = editor.concatenate_audioclips(clips)
-            logging.info(
+            logger.info(
                 f"Reduced duration from {media.duration:.1f} to {final_clip.duration:.1f}"
             )
 
@@ -164,4 +165,4 @@ class Cutter:
             )
 
         media.close()
-        logging.info(f"Saved media to {output_fn}")
+        logger.info(f"Saved media to {output_fn}")

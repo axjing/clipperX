@@ -15,7 +15,7 @@ class Logging(object):
     Log输出标注设置
     """
 
-    def __init__(self, logger=None, log_cate='train_running'):
+    def __init__(self, logger=None, log_cate='log_run'):
         """
         指定保存日志的文件路径，日志级别，以及调用文件。将日志存入到指定的文件中
         :param logger:调用模块名，一般输入__name__

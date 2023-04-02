@@ -1,9 +1,9 @@
 import argparse
-import logging
 import os
 
+from common.log_wrappers import Logging
 from common import utils
-
+logger=Logging(__name__).get_logger()
 
 def main():
     parser = argparse.ArgumentParser(
@@ -11,10 +11,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    logging.basicConfig(
-        format="[autocut:%(filename)s:L%(lineno)d] %(levelname)-6s %(message)s"
-    )
-    logging.getLogger().setLevel(logging.INFO)
+    # logging.basicConfig(
+    #     format="[autocut:%(filename)s:L%(lineno)d] %(levelname)-6s %(message)s"
+    # )
+    # logging.getLogger().setLevel(logging.INFO)
 
     parser.add_argument("inputs", type=str, default="./data/test_001.mp4",nargs="+", help="Inputs filenames/folders")
     parser.add_argument(
@@ -108,9 +108,10 @@ def main():
         elif len(args.inputs) == 1:
             trans_srt_to_md(args.encoding, args.force, args.inputs[0])
         else:
-            logging.warn(
-                "Wrong number of files, please pass in a .srt file or an additional video file"
-            )
+            logger.warn("Wrong number of files, please pass in a .srt file or an additional video file")
+            # logging.warn(
+            #     "Wrong number of files, please pass in a .srt file or an additional video file"
+            # )
     elif args.cut:
         from cores.cut import Cutter
 
@@ -122,7 +123,8 @@ def main():
     elif args.s:
         utils.compact_rst(args.inputs[0], args.encoding)
     else:
-        logging.warn("No action, use -c, -t or -d")
+        logger.warn("No action, use -c, -t or -d")
+        # logging.warn("No action, use -c, -t or -d")
 
 
 if __name__ == "__main__":
