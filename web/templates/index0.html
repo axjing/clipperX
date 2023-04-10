@@ -1,0 +1,47 @@
+{% extends "base0.html" %} {% block content %}
+<!-- <div class="container">
+    <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/realtime"  type = "submit">Video Processor</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+<div>
+     -->
+<div class="main">
+  <div class="title">
+    <h1>JANClipper</h1>
+  </div>
+
+  <div class="panel">
+    <form action = "/images" method = "POST"
+    enctype = "multipart/form-data">
+    <input id="file-input"
+            class="hidden" 
+            type="file" 
+            accept="image/x-png,image/gif,image/jpeg,video/mp4,video/avi"
+            onchange='showPicked(this)'/>
+
+    <label for="file-upload" id="file-drag" class="upload-box" onclick='showPicker()'>
+      <div id="upload-caption">Drop image/video here or click to select</div>
+      <img id="image-preview" class="hidden" />
+    </label>
+  </div>
+  <div style="margin-bottom: 2rem;">
+    <input type="button" value="Submit" class="button" onclick="submitImage();" />
+    <input type="button" value="Clear" class="button" onclick="clearImage();" />
+  </div>
+
+  <div id="image-box">
+    <img id="image-display" />
+    <div id="pred-result" class="hidden"></div>
+    <svg id="loader" class="hidden" viewBox="0 0 32 32" width="32" height="32">
+      <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+    </svg>
+  </div>
+
+</div>
+
+{% endblock %}

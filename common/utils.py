@@ -13,7 +13,13 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 
-
+def gen_web(camera):
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        
 def base64_to_pil(img_base64):
     """
     Convert base64 image data to PIL image
@@ -32,6 +38,13 @@ def np_to_base64(img_np):
     img.save(buffered, format="PNG")
     return u"data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode("ascii")
 
+def str_to_bool(s):
+    if s == "true":
+        return True
+    elif s == "false":
+        return False
+    else:
+        raise ValueError
 
 def is_video(filename):
     _, ext = os.path.splitext(filename)

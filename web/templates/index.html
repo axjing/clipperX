@@ -1,32 +1,38 @@
-{% extends "base.html" %} {% block content %}
-
-<div class="main">
-  <div class="title">
-    <h3>JANClipper</h3>
-    <!-- <p>
-      <small>A web app</small>
-    </p> -->
-  </div>
-
-  <div class="panel">
-    <input id="file-upload" class="hidden" type="file" accept="image/x-png,image/gif,image/jpeg" />
-    <label for="file-upload" id="file-drag" class="upload-box">
-      <div id="upload-caption">Drop image here or click to select</div>
-      <img id="image-preview" class="hidden" />
-    </label>
-  </div>
-  <div style="margin-bottom: 2rem;">
-    <input type="button" value="Submit" class="button" onclick="submitImage();" />
-    <input type="button" value="Clear" class="button" onclick="clearImage();" />
-  </div>
-
-  <div id="image-box">
-    <img id="image-display" />
-    <div id="pred-result" class="hidden"></div>
-    <svg id="loader" class="hidden" viewBox="0 0 32 32" width="32" height="32">
-      <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
-    </svg>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+  <link rel='stylesheet' href='../static/style1.css'>
+  <script src='../static/client.js'></script>
+</head>
+<body>
+<div>
+  <div class='center'>
+    <div class='title'>Object Detection</div>
+    <div class='content'>
+      <div class='no-display'>
+      <form action = "/image" method = "POST"
+         enctype = "multipart/form-data">
+         <input id='file-input'
+               class='no-display'
+               type='file'
+               name='images'
+               accept='image/png,image/jpeg,image/jpg,video/mp4,video/avi'
+               onchange='showPicked(this)'>
+      </div>
+      <button class='choose-file-button' type='button' onclick='showPicker()'>Select Image</button>
+      <div class='upload-label'>
+        <label id='upload-label'>No file chosen</label>
+      </div>
+      <div>
+        <img id='image-picked' class='no-display' alt='Chosen Image' height='250'>
+        <video autoplay="autoplay" id='image-picked1' class='no-display' alt='Chosen Image' height='250'>
+      </div>
+      <div class='analyze'>
+        <button id="analyze-button" class="analyze-button" type = "submit">Analyze</button>
+      </div>
+      </form>
+    </div>
   </div>
 </div>
-
-{% endblock %}
+</body>
+</html>

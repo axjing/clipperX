@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*.jpg
+*.mp4
+*.txt
 # C extensions
 *.so
 caches/models--*
