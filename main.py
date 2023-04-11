@@ -3,7 +3,11 @@ import os
 
 from common.log_wrappers import Logging
 from common import utils
+from common.yaml_parser import YamlParser
+
 logger=Logging(__name__).get_logger()
+
+TRANSCRIBE,CUT, DAEMON,TO_MD,SRT_TO_COMACT=["transcribe","cut", "daemon","to_md","srt_to_compact"]
 
 def get_input_param():
     parser = argparse.ArgumentParser(
@@ -12,91 +16,22 @@ def get_input_param():
     )
 
     parser.add_argument("inputs", type=str, default="./data/test_001.mp4",nargs="+", help="Inputs filenames/folders")
-    parser.add_argument(
-        "-t",
-        "--transcribe",
-        help="Transcribe videos/audio into subtitles",
-        action='store_true',
-    )
-    parser.add_argument(
-        "-c",
-        "--cut",
-        help="Cut a video based on subtitles",
-        action='store_true',
-    )
-    parser.add_argument(
-        "-d",
-        "--daemon", 
-        help="Monitor a folder to transcribe and cut",
-        action='store_true',
-    )
-    parser.add_argument(
-        "-s",
-        help="Convert .srt to a compact format for easier editing",
-        action='store_true',
-    )
-    parser.add_argument(
-        "-m",
-        "--to-md",
-        help="Convert .srt to .md for easier editing",
-        action='store_true',
-    )
-    parser.add_argument(
-        "--lang",
-        type=str,
-        default="zh",
-        choices=["zh", "en"],
-        help="The output language of transcription",
-    )
-    parser.add_argument(
-        "--prompt", type=str, default="",required=False, help="initial prompt feed into whisper"
-    )
-    parser.add_argument(
-        "--whisper-model",
-        type=str,
-        default="small",required=False,
-        choices=["tiny", "base", "small", "medium", "large", "large-v2"],
-        help="The whisper model used to transcribe.",
-    )
-    parser.add_argument(
-        "--bitrate",
-        type=str,
-        default="10m",required=False,
-        help="The bitrate to export the cutted video, such as 10m, 1m, or 500k",
-    )
-    parser.add_argument(
-        "--vad", 
-        required=False,
-        help="If or not use VAD", choices=["1", "0", "auto"], default="auto"
-    )
-    parser.add_argument(
-        "--force",
-        help="Force write even if files exist",
-        action='store_true',
-    )
-    parser.add_argument(
-        "--encoding", type=str, default="utf-8", required=False,help="Document encoding format"
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default=None,
-        choices=["cpu", "cuda"],
-        help="Force to CPU or GPU for transcribing. In default automatically use GPU if available.",
-    )
+    parser.add_argument('-cfg', '--cfg', default='config', required=False, type=str,
+                        help='Your detailed configuration of Flow')
 
     args = parser.parse_args()
+    args = YamlParser(args.cfg, path='').add_args(args)
+    logger.info(args)
     return args
 
 def main():
     
     args = get_input_param()
 
-    if args.transcribe:
-        from cores.transcribe import Transcribe
-
+    if args.cut_mode==TRANSCRIBE:
+        from cores.transcriber import Transcribe
         Transcribe(args).run()
-    elif args.to_md:
+    elif args.cut_mode==TO_MD:
         from common.utils import trans_srt_to_md
 
         if len(args.inputs) == 2:
@@ -110,15 +45,15 @@ def main():
         else:
             logger.warn("Wrong number of files, please pass in a .srt file or an additional video file")
 
-    elif args.cut:
+    elif args.cut_mode==CUT:
         from cores.cut import Cutter
 
         Cutter(args).run()
-    elif args.daemon:
+    elif args.cut_mode==DAEMON:
         from cores.daemon import Daemon
 
         Daemon(args).run()
-    elif args.s:
+    elif args.cut_mode==SRT_TO_COMACT:
         utils.compact_rst(args.inputs[0], args.encoding)
     else:
         logger.warn("No action, use -c, -t or -d")

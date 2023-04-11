@@ -3,49 +3,37 @@
 JANClipper自动生成视频字幕，可筛选视频片段自动剪辑。
 
 ## 使用方法
-
-### 转录视频生成 `.srt` 和 `.md` 文件的字幕
-
-```bash
-python main.py -t test_video.mp4
 ```
-
-1. 如果对转录质量不满意，可以使用更大的模型，例如
-
-```bash
-python main.py -t test_video.mp4 --whisper-model large
+python main.py test_video.mp4 --cfg=config
 ```
-
-默认是 `small`。更好的模型是 `medium` 和 `large`，但推荐使用 GPU 获得更好的速度。也可以使用更快的 `tiny` 和 `base`，但转录质量会下降。
-
-
-### 剪切视频
-
-```bash
-python main.py -c test_video.mp4 test_video.srt test_video.md # 默认视频比特率是 `--bitrate 10m`，你可以根据需要调大调小。
+其中config内容包括
+```yaml
+# ./caches/config.yaml
+encoding: UTF-8     # 默认输出编码是 `utf-8`. 确保你的编辑器也使用了 `utf-8` 解码。你可以通过 `--encoding` 指定其他编码格式。但是需要注意生成字幕文件和使用字幕文件剪辑时的编码格式需要一致。例如使用 `gbk`。
+device: cpu         # choices=["cpu", "cuda"]
+use_VAD: auto       # ["1", "0", "auto"] If or not use VAD"
+force_write: False  #  Force write even if files exist
+bitrate: 10m        # The bitrate to export the cutted video, such as 10m, 1m, or 500k 默认视频比特率是 `--bitrate 10m`，你可以根据需要调大调小
+prompt: Hello       # initial prompt feed into whisper
+whisper_model: tiny # choices=["tiny", "base", "small", "medium", "large", "large-v2"]  help="The whisper model used to transcribe." 默认是 `small`。更好的模型是 `medium` 和 `large`，但推荐使用 GPU 获得更好的速度。也可以使用更快的 `tiny` 和 `base`，但转录质量会下降。
+language: zh        # choices=["zh", "en"], help="The output language of transcription"
+cut_mode: cut       # choices=["transcribe","cut", "daemon","to_md","srt_to_compact"],
+                        # transcribe 转录视频生成 `.srt` 和 `.md` 文件的字幕
+                        # cut 如果不习惯 Markdown 格式文件，你也可以直接在 `srt` 文件里删除不要的句子，在剪切时不传入 `md` 文件名
+                        # to_md 如果仅有 `srt` 文件，编辑不方便可以使用如下命令生成 `md` 文件，然后编辑 `md` 文件即可，但此时会完全对照 `srt` 生成，不会出现 `no speech` 等提示文本。
+                        # srt_to_compact 解决 `srt` 里面空行太多。你可以使用 `python main.py -s test_video.srt` 来生成一个紧凑些的版本 `test_video_compact.srt` 方便编辑，编辑完成后，`python main.py -s test_video_compact.srt` 转回正常格式。
 ```
-1. 如果不习惯 Markdown 格式文件，你也可以直接在 `srt` 文件里删除不要的句子，在剪切时不传入 `md` 文件名:
-```bash
-python main.py -c test_video.mp4 test_video.srt
+### 操作步骤
+1. 设置`./caches/config.yaml`中配置参数
+2. 设置`./caches/config.yaml`中配置参数**cut_mode: transcribe** ，识别视频字幕，并保存字幕为`.srt` 和 `.md`
 ```
-2. 如果仅有 `srt` 文件，编辑不方便可以使用如下命令生成 `md` 文件，然后编辑 `md` 文件即可，但此时会完全对照 `srt` 生成，不会出现 `no speech` 等提示文本。
-```bash
-python main.py -m test.srt test.mp4
-python main.py -m test.mp4 test.srt # 支持视频和字幕乱序传入
-python main.py -m test.srt # 也可以只传入字幕文件
+python main.py E:\ArtLife\JVideoClips\202112052123.mp4 --cfg=config
 ```
-3. 编辑更新生成更新的字幕 `test_video_edited.srt`;
-```bash
-python main.py -s test_video.md test_video.srt
+3. 从识别的字幕中删除需要剪辑掉的的字幕
+4. 设置`./caches/config.yaml`中配置参数**cut_mode: cut** ，识别视频字幕，并保存字幕为`.srt` 和 `.md`
 ```
-4. 解决 `srt` 里面空行太多。你可以使用 `python main.py -s test_video.srt` 来生成一个紧凑些的版本 `test_video_compact.srt` 方便编辑，编辑完成后，`python main.py -s test_video_compact.srt` 转回正常格式。
-5. 如果输出的乱码
-python main.py 默认输出编码是 `utf-8`. 确保你的编辑器也使用了 `utf-8` 解码。你可以通过 `--encoding` 指定其他编码格式。但是需要注意生成字幕文件和使用字幕文件剪辑时的编码格式需要一致。例如使用 `gbk`。
-```bash
-python main.py -t test.mp4 --encoding=gbk
-python main.py -c test.mp4 test.srt test.md --encoding=gbk
+python main.py E:\ArtLife\JVideoClips\202112052123.mp4 --cfg=config
 ```
-
 
 ## 参考项目
 - [Whisper](https://github.com/openai/whisper.git)

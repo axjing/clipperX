@@ -3,7 +3,7 @@ import glob
 import os
 import time
 
-from . import cut, transcribe, utils
+from cores import cut, transcriber, utils
 from common.log_wrappers import Logging
 
 logger = Logging(__name__).get_logger()
@@ -33,7 +33,7 @@ class Daemon:
             if srt_fn not in files or md_fn not in files:
                 args.inputs = [f]
                 try:
-                    transcribe.Transcribe(args).run()
+                    transcriber.Transcribe(args).run()
                     self.sleep = 1
                     break
                 except RuntimeError as e:

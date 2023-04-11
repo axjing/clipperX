@@ -38,13 +38,13 @@ class Transcribe:
         for input in self.args.inputs:
             logger.info(f"Transcribing {input}")
             name, _ = os.path.splitext(input)
-            if utils.check_exists(name + ".md", self.args.force):
+            if utils.check_exists(name + ".md", self.args.force_write):
                 continue
 
             audio = whisper.load_audio(input, sr=self.sampling_rate)
             if (
-                self.args.vad == "1"
-                or self.args.vad == "auto"
+                self.args.use_VAD == "1"
+                or self.args.use_VAD == "auto"
                 and not name.endswith("_cut")
             ):
                 speech_timestamps = self._detect_voice_activity(audio)
@@ -111,7 +111,7 @@ class Transcribe:
                             self.whisper_model,
                             audio,
                             seg,
-                            self.args.lang,
+                            self.args.language,
                             self.args.prompt,
                         ),
                         callback=lambda x: pbar.update(),
@@ -131,7 +131,7 @@ class Transcribe:
                 r = self.whisper_model.transcribe(
                     audio[int(seg["start"]) : int(seg["end"])],
                     task="transcribe",
-                    language=self.args.lang,
+                    language=self.args.language,
                     initial_prompt=self.args.prompt,
                     verbose=False if len(speech_timestamps) == 1 else None,
                 )

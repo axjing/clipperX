@@ -1,2 +1,10 @@
-gpu: 0
 encoding: UTF-8
+device: cuda         # choices=["cpu", "cuda"]
+use_VAD: auto       # ["1", "0", "auto"]
+force_write: False  #  Force write even if files exist
+bitrate: 10m        # The bitrate to export the cutted video, such as 10m, 1m, or 500k
+prompt: Hello       # initial prompt feed into whisper
+whisper_model: tiny # choices=["tiny", "base", "small", "medium", "large", "large-v2"]  help="The whisper model used to transcribe."
+language: zh        # choices=["zh", "en"], help="The output language of transcription"
+cut_mode: transcribe       # choices=["transcribe","cut", "daemon","to_md","srt_to_compact"],
+       

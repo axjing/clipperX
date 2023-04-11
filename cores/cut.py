@@ -4,7 +4,7 @@ import re
 import srt
 from moviepy import editor
 
-from . import utils
+from common import utils
 from common.log_wrappers import Logging
 logger = Logging(__name__).get_logger()
 
@@ -91,7 +91,7 @@ class Cutter:
         is_video_file = utils.is_video(fns["media"])
         outext = "mp4" if is_video_file else "mp3"
         output_fn = utils.change_ext(utils.add_cut(fns["media"]), outext)
-        if utils.check_exists(output_fn, self.args.force):
+        if utils.check_exists(output_fn, self.args.force_write):
             return
 
         with open(fns["srt"], encoding=self.args.encoding) as f:

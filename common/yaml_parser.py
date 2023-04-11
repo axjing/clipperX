@@ -83,8 +83,9 @@ def load(fname):
     return ret
 
 class YamlParser(AttrDict):
-    def __init__(self, cfg_name='config', log='',path='PATH'):
-        self.add_cfg(path)
+    def __init__(self, cfg_name='config', path=''):
+        if path is not '':
+            self.add_cfg(path)
 
         if cfg_name:
             self.add_cfg(cfg_name)
