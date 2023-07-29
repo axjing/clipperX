@@ -15,7 +15,7 @@ def get_input_param():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    parser.add_argument("inputs", type=str, default="./data/test_001.mp4",nargs="+", help="Inputs filenames/folders")
+    parser.add_argument("inputs", type=str, default=r"E:/ARTLIFEVido/230430/20230430_225530-1.m4a",nargs="+", help="Inputs filenames/folders")
     parser.add_argument('-cfg', '--cfg', default='config', required=False, type=str,
                         help='Your detailed configuration of Flow')
 

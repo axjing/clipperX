@@ -33,14 +33,15 @@ class Transcribe:
         self.whisper_model = None
         self.vad_model = None
         self.detect_speech = None
-
+        
     def run(self):
         for input in self.args.inputs:
             logger.info(f"Transcribing {input}")
+            
             name, _ = os.path.splitext(input)
             if utils.check_exists(name + ".md", self.args.force_write):
                 continue
-
+            
             audio = whisper.load_audio(input, sr=self.sampling_rate)
             if (
                 self.args.use_VAD == "1"
@@ -53,10 +54,11 @@ class Transcribe:
             transcribe_results = self._transcribe(audio, speech_timestamps)
 
             output = name + ".srt"
-            self._save_srt(output, transcribe_results)
+            srt=self._save_srt(output, transcribe_results)
             logger.info(f"Transcribed {input} to {output}")
             self._save_md(name + ".md", output, input)
             logger.info(f'Saved texts to {name + ".md"} to mark sentences')
+            return srt
 
     def _detect_voice_activity(self, audio):
         """Detect segments that have voice activities"""
@@ -104,24 +106,38 @@ class Transcribe:
             pool = Pool(processes=4)
             # TODO, a better way is merging these segments into a single one, so whisper can get more context
             for seg in speech_timestamps:
-                res.append(
-                    pool.apply_async(
-                        process,
-                        (
-                            self.whisper_model,
-                            audio,
-                            seg,
-                            self.args.language,
-                            self.args.prompt,
-                        ),
-                        callback=lambda x: pbar.update(),
-                    )
+                r = self.whisper_model.transcribe(
+                    audio[int(seg["start"]) : int(seg["end"])],
+                    task="transcribe",
+                    language=self.args.language,
+                    initial_prompt=self.args.prompt,
+                    verbose=False if len(speech_timestamps) == 1 else None,
                 )
-            pool.close()
-            pool.join()
-            pbar.close()
+                r["origin_timestamp"] = seg
+                res.append(r)
+            #     res.append(
+            #         pool.apply_async(
+            #             process,
+            #             (
+            #                 self.whisper_model,
+            #                 audio,
+            #                 seg,
+            #                 self.args.language,
+            #                 self.args.prompt,
+            #             ),
+            #             callback=lambda x: pbar.update(),
+            #         )
+            #     )
+            # pool.close()
+            # pool.join()
+            # pbar.close()
+            # res_l=[]
+            # for i in res:
+            #     res_l.append(i.get())
+            #     del i
+            # return res_l
             logger.info(f"Done transcription in {time.time() - tic:.1f} sec")
-            return [i.get() for i in res]
+            return res
         else:
             for seg in (
                 speech_timestamps
@@ -174,6 +190,8 @@ class Transcribe:
 
         with open(output, "wb") as f:
             f.write(srt.compose(subs).encode(self.args.encoding, "replace"))
+            
+        return subs
 
     def _save_md(self, md_fn, srt_fn, video_fn):
         with open(srt_fn, encoding=self.args.encoding) as f:
