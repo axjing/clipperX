@@ -12,7 +12,10 @@ import numpy as np
 
 from PIL import Image
 from io import BytesIO
-
+def read_file(file_path,encoding="utf-8"):
+    with open(file_path,"r",encoding=encoding) as f:
+        txt=f.read()
+    return txt
 def gen_web(camera):
     """Video streaming generator function."""
     while True:

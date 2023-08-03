@@ -34,6 +34,14 @@ python main.py E:\ArtLife\JVideoClips\202112052123.mp4 --cfg=config
 ```
 python main.py E:\ArtLife\JVideoClips\202112052123.mp4 --cfg=config
 ```
+## 常见问题
+### ffmpeg未安装
+```sh
+scoop install ffmpeg    # for win
+```
+并将`C:\Users\xxxx\scoop\apps\ffmpeg\6.0\bin`添加到环境变量
+
+其他系统一样
 
 ## 参考项目
 - [Whisper](https://github.com/openai/whisper.git)
