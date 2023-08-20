@@ -1,6 +1,6 @@
-# JANClipper
+# clipperX
 
-JANClipper自动生成视频字幕，可筛选视频片段自动剪辑。
+clipperX自动生成视频字幕，可筛选视频片段自动剪辑。
 
 ## 使用方法
 ```

@@ -6,6 +6,8 @@ __pycache__/
 *.jpg
 *.mp4
 *.txt
+caches/ckpt
+flagged
 # C extensions
 *.so
 caches/models--*
